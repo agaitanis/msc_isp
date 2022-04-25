@@ -3,8 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package project;
-import  simbad.sim.*;
-import javax.vecmath.Vector3d;
+import simbad.sim.*;
+import javax.vecmath.*;
 
 /**
  *
@@ -13,11 +13,13 @@ import javax.vecmath.Vector3d;
 public class MyRobot extends Agent {
     LightSensor lightLeft;
     LightSensor lightRight;
+    Point3d goal;
     
-    public MyRobot (Vector3d position, String name) {     
+    public MyRobot (Vector3d position, String name, Point3d goalPos) {     
         super(position, name);
         lightLeft = RobotFactory.addLightSensorLeft(this);
         lightRight = RobotFactory.addLightSensorRight(this);
+        goal = goalPos;
     }
     
     @Override
@@ -28,5 +30,12 @@ public class MyRobot extends Agent {
     
     @Override
     public void performBehavior() {
+        Point3d robotPos = new Point3d();
+        
+        this.getCoords(robotPos);
+        
+        System.out.println("dist = " + robotPos.distance(goal) +
+                ", lux = (" + lightLeft.getLux() +
+                ", " + lightRight.getLux() + ")");
     }
 }
