@@ -1,0 +1,25 @@
+24 15
+xxxxxxxxxxxxxxx
+x-------------x
+x-------------x
+x----g--------x
+x----xx-------x
+xxxxxxx-------x
+x-------------x
+x-------------x
+x-----xxxxxxxxx
+x-----xxxxxxxxx
+x------------xx
+x------------xx
+xxxxxxxx-----xx
+x----x-------xx
+x----x-------xx
+x----xxx-----xx
+x------------xx
+x------------xx
+x---xxxxxx---xx
+x---xx---x---xx
+x---xx---xxxxxx
+x-------------x
+x-----------r-x
+xxxxxxxxxxxxxxx
