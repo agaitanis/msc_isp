@@ -25,3 +25,4 @@ hs_err_pid*
 /Examples/MyFirst/build/
 /project/nbproject/private/
 /project/build/
+/project/dist/
