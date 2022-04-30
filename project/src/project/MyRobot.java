@@ -4,6 +4,7 @@ import simbad.sim.*;
 import javax.vecmath.*;
 
 enum RobotStatus {
+    FOLLOW_LINE,
     MOVE_FWD,
     REORIENT,
     CIRVUMNAVIGATE,
@@ -11,6 +12,7 @@ enum RobotStatus {
 }
 
 public class MyRobot extends Agent {
+    LineSensor line;
     LightSensor leftLight;
     LightSensor rightLight;
     RangeSensorBelt sonars;
@@ -32,21 +34,21 @@ public class MyRobot extends Agent {
     static double K_TRANSL = 35;
     static double K_TRANSL_2 = 0.01;
     static double GOAL_LUX = 0.053;
-    static boolean CLOCKWISE = false;
     
     static double SAFETY = 0.8;
     static double K1 = 2;
     static double K2 = 1;
     static double K3 = 3;
+    static boolean CLOCKWISE = true;
     
     public MyRobot (Vector3d position, String name) {
         super(position, name);
-        status = RobotStatus.MOVE_FWD;
         leftLight = RobotFactory.addLightSensorLeft(this);
         rightLight = RobotFactory.addLightSensorRight(this);
         sonars = RobotFactory.addSonarBeltSensor(this, 12, 1.5f);
         bumpers = RobotFactory.addBumperBeltSensor(this, 8);
-        status = RobotStatus.REORIENT;
+        line = RobotFactory.addLineSensor(this, 5);
+        status = RobotStatus.MOVE_FWD; // FIXME Change to RobotStatus.FOLLOW_LINE
         leftLuxSum = 0;
         rightLuxSum = 0;
         leftLux = 0;
@@ -197,6 +199,10 @@ public class MyRobot extends Agent {
         return bumpers.oneHasHit();
     }
     
+    private void followLine() {
+        // FIXME
+    }
+    
     @Override
     public void initBehavior() {
     }
@@ -215,6 +221,17 @@ public class MyRobot extends Agent {
         }
         
         switch (status) {
+            case FOLLOW_LINE:
+                if (bumperWasHit()) {
+                    if (iL != getIntensity()) iH = getIntensity();
+                    circumNavigate();
+//                } else if (noLineWasDetected()) { // FIXME
+//                    iL = getIntensity();
+//                    moveFwd();
+                } else {
+                    followLine();
+                }
+                break;
             case MOVE_FWD:
                 if (bumperWasHit()) {
                     if (iL != getIntensity()) iH = getIntensity();
