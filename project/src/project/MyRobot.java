@@ -41,7 +41,7 @@ public class MyRobot extends Agent {
     static double K3 = 3;
     static boolean CLOCKWISE = true;
     
-    public MyRobot (Vector3d position, String name) {
+    public MyRobot(Vector3d position, String name) {
         super(position, name);
         leftLight = RobotFactory.addLightSensorLeft(this);
         rightLight = RobotFactory.addLightSensorRight(this);
@@ -149,7 +149,7 @@ public class MyRobot extends Agent {
         setTranslationalVelocity(K_TRANSL*(Math.log10(Math.abs(goalDiff) + 1) + K_TRANSL_2));
         setRotationalVelocity(0);
     }
-        
+    
     private double wrapToPi(double a) {
         while (a > Math.PI) {
             a -= Math.PI*2;
@@ -159,7 +159,7 @@ public class MyRobot extends Agent {
         }
         return a;
     }
-        
+    
     private Point3d getSensedPoint(int sonar){        
         double v = radius + sonars.getMeasurement(sonar);
         double x = v*Math.cos(sonars.getSensorAngle(sonar));
@@ -205,6 +205,7 @@ public class MyRobot extends Agent {
     
     @Override
     public void initBehavior() {
+        rotateY(Math.PI);
     }
     
     @Override
