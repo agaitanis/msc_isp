@@ -4,7 +4,9 @@ import simbad.sim.*;
 import javax.vecmath.*;
 
 enum RobotStatus {
-    FOLLOW_LINE,
+    FOLLOW_LINE_STRAIGHT,
+    FOLLOW_LINE_LEFT,
+    FOLLOW_LINE_RIGHT,
     MOVE_FWD,
     REORIENT,
     CIRVUMNAVIGATE,
@@ -28,6 +30,7 @@ public class MyRobot extends Agent {
     double iL;
     double iH;
     int cnt;
+    boolean init = false;
     
     static double K_ROT = 10;
     static double K_ROT_2 = 0.03;
@@ -39,7 +42,7 @@ public class MyRobot extends Agent {
     static double K1 = 2;
     static double K2 = 1;
     static double K3 = 3;
-    static boolean CLOCKWISE = true;
+    static boolean CLOCKWISE = false;
     
     public MyRobot(Vector3d position, String name) {
         super(position, name);
@@ -47,8 +50,8 @@ public class MyRobot extends Agent {
         rightLight = RobotFactory.addLightSensorRight(this);
         sonars = RobotFactory.addSonarBeltSensor(this, 12, 1.5f);
         bumpers = RobotFactory.addBumperBeltSensor(this, 8);
-        line = RobotFactory.addLineSensor(this, 5);
-        status = RobotStatus.MOVE_FWD; // FIXME Change to RobotStatus.FOLLOW_LINE
+        line = RobotFactory.addLineSensor(this, 11);
+        status = RobotStatus.FOLLOW_LINE_STRAIGHT;
         leftLuxSum = 0;
         rightLuxSum = 0;
         leftLux = 0;
@@ -199,13 +202,51 @@ public class MyRobot extends Agent {
         return bumpers.oneHasHit();
     }
     
+    private boolean lineWasDetected() {
+        for (int i = 0; i < line.getNumSensors(); i++) {
+            if (line.hasHit(i)) return true;
+        }
+        
+        return false;
+    }
+    
     private void followLine() {
-        // FIXME
+        int left = 0;
+        int right = 0;
+        int k = 0;
+        
+        for (int i = 0; i < line.getNumSensors()/2; i++) {
+            left += line.hasHit(i) ? 1 : 0;
+            right += line.hasHit(line.getNumSensors() - i - 1) ? 1 : 0;
+            k++;
+        }
+               
+        if (left == 1 && right == 1) {
+            status = RobotStatus.FOLLOW_LINE_STRAIGHT;
+        } else if (left >= 3 && right >= 3) {
+            if (leftLux > rightLux) {
+                status = RobotStatus.FOLLOW_LINE_LEFT;
+            } else {
+                status = RobotStatus.FOLLOW_LINE_RIGHT;
+            }
+        }
+        
+        if (status == RobotStatus.FOLLOW_LINE_LEFT) {
+            right = 0;
+        } else if (status == RobotStatus.FOLLOW_LINE_RIGHT) {
+            left = 0;
+        }
+               
+        double diff = (left - right)/(float)k;
+               
+        setRotationalVelocity(diff);
+        setTranslationalVelocity(1 - Math.abs(diff));
     }
     
     @Override
     public void initBehavior() {
-        rotateY(Math.PI);
+        status = RobotStatus.FOLLOW_LINE_STRAIGHT;
+        setTranslationalVelocity(1);
     }
     
     @Override
@@ -222,13 +263,15 @@ public class MyRobot extends Agent {
         }
         
         switch (status) {
-            case FOLLOW_LINE:
+            case FOLLOW_LINE_STRAIGHT:
+            case FOLLOW_LINE_LEFT:
+            case FOLLOW_LINE_RIGHT:
                 if (bumperWasHit()) {
                     if (iL != getIntensity()) iH = getIntensity();
                     circumNavigate();
-//                } else if (noLineWasDetected()) { // FIXME
-//                    iL = getIntensity();
-//                    moveFwd();
+                } else if (!lineWasDetected()) {
+                    iL = getIntensity();
+                    moveFwd();
                 } else {
                     followLine();
                 }
@@ -237,6 +280,8 @@ public class MyRobot extends Agent {
                 if (bumperWasHit()) {
                     if (iL != getIntensity()) iH = getIntensity();
                     circumNavigate();
+                } else if (lineWasDetected()) {
+                    followLine();
                 } else if (shouldReorient()) {
                     if (iL != getIntensity()) iH = getIntensity();
                     reorient();
@@ -253,7 +298,9 @@ public class MyRobot extends Agent {
                 }
                 break;
             case CIRVUMNAVIGATE:
-                if (foundLocalMax() && getIntensity() > iH) {
+                if (lineWasDetected() && !bumperWasHit()) {
+                    followLine();
+                } else if (foundLocalMax() && getIntensity() > iH) {
                     reorient();
                 } else {
                     circumNavigate();

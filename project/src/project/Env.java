@@ -5,34 +5,48 @@ import simbad.sim.*;
 
 public class Env extends EnvironmentDescription {
     public Env() {
-        Point3d light = new Point3d(7, 2, -5);
+        Point3d light = new Point3d(-6, 2, 3);
         light1SetPosition(light.x, light.y, light.z);
         light2SetPosition(light.x, light.y, light.z);
+        
+        add(new MyRobot(new Vector3d(-2, 0, 8), "my robot"));
         add(new CherryAgent(new Vector3d(light.x, 0, light.z), "goal", 0.1f));
-        
-        add(new MyRobot(new Vector3d(2, 0, 8), "my robot"));
-        
-        Line line = new Line(new Vector3d(-6, 0, 8), 10, this);
-        line.rotate90(1);
-        add(line);
-        
-        add(new Line(new Vector3d(-6, 0, -9), 17, this));
-        
-        Line line2 = new Line(new Vector3d(-6, 0, -9), 13, this);
-        line2.rotate90(1);
-        add(line2);
-        
-        Wall wall = new Wall(new Vector3d(-4, 0, 1), 10, 1, this);
+
+        Wall wall = new Wall(new Vector3d(6, 0, 0), 12, 1, this);
         wall.rotate90(1);
         add(wall);
         
-        add(new Wall(new Vector3d(3, 0, 6), 14, 1, this));
+        add(new Wall(new Vector3d(-2, 0, 6), 16, 1, this));
         
-        add(new Box(new Vector3d(5, 0, 0), new Vector3f(5, 1, 2), this));
-        add(new Box(new Vector3d(0, 0, -5), new Vector3f(2, 1, 5), this));
+        add(new Box(new Vector3d(2, 0, 0), new Vector3f(2, 1, 7), this));
+        add(new Box(new Vector3d(-2, 0, -1), new Vector3f(2, 1, 10), this));
         
-        Arch arch = new Arch(new Vector3d(5, 0, -5), this);
-        arch.rotate90(1);
-        add(arch);
+        add(new Arch(new Vector3d(-6, 0, 0), this));
+              
+        Line line = new Line(new Vector3d(-4, 0, 8), 12, this);
+        line.rotate90(1);
+        add(line);
+        
+        add(new Line(new Vector3d(8, 0, -8), 16, this));
+        
+        Line line2 = new Line(new Vector3d(-8, 0, -8), 16, this);
+        line2.rotate90(1);
+        add(line2);
+        
+        Line line3 = new Line(new Vector3d(6, 0, -1), 2, this);
+        line3.rotate90(1);
+        add(line3);
+        
+        add(new Line(new Vector3d(-6, 0, -8), 8, this));
+        add(new Line(new Vector3d(2, 0, -8), 5, this));
+        add(new Line(new Vector3d(-8, 0, -2), 2, this));
+        
+        Line line4 = new Line(new Vector3d(-8, 0, -2), 2, this);
+        line4.rotate90(1);
+        add(line4);
+        
+        Line line5 = new Line(new Vector3d(-6, 0, -4), 4, this);
+        line5.rotate90(1);
+        add(line5);
     }
 }
