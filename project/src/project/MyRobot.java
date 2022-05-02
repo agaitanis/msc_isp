@@ -220,23 +220,29 @@ public class MyRobot extends Agent {
             right += line.hasHit(line.getNumSensors() - i - 1) ? 1 : 0;
             k++;
         }
-               
+        
         if (left == 1 && right == 1) {
             status = RobotStatus.FOLLOW_LINE_STRAIGHT;
-        } else if (left >= 3 && right >= 3) {
-            if (leftLux > rightLux) {
-                status = RobotStatus.FOLLOW_LINE_LEFT;
-            } else {
-                status = RobotStatus.FOLLOW_LINE_RIGHT;
-            }
         }
         
         if (status == RobotStatus.FOLLOW_LINE_LEFT) {
             right = 0;
         } else if (status == RobotStatus.FOLLOW_LINE_RIGHT) {
             left = 0;
+        } else {
+            if (left >= 3 && right >= 3) {
+                if (leftLux > rightLux) {
+                    status = RobotStatus.FOLLOW_LINE_LEFT;
+                    right = 0;
+                } else {
+                    status = RobotStatus.FOLLOW_LINE_RIGHT;
+                    left = 0;
+                } 
+            } else {
+                status = RobotStatus.FOLLOW_LINE_STRAIGHT;
+            }
         }
-               
+             
         double diff = (left - right)/(float)k;
                
         setRotationalVelocity(diff);
@@ -245,8 +251,7 @@ public class MyRobot extends Agent {
     
     @Override
     public void initBehavior() {
-        status = RobotStatus.FOLLOW_LINE_STRAIGHT;
-        setTranslationalVelocity(1);
+
     }
     
     @Override
@@ -290,7 +295,9 @@ public class MyRobot extends Agent {
                 }
                 break;
             case REORIENT:
-                if (isAlignedWithLight()) {
+                if (lineWasDetected()) {
+                    followLine();
+                } else if (isAlignedWithLight()) {
                     iL = getIntensity();
                     moveFwd();
                 } else {
